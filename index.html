@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Mini Art Drop — Verify</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="styles.css" rel="stylesheet" />
+  <meta name="description" content="Verify a found mini art drop via NFC code or manual entry." />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <h1>Mini Art Drops</h1>
+      <p class="sub">Tap from the NFC tag or enter your code below to verify.</p>
+    </div>
+  </header>
+
+  <main class="wrap card">
+    <form id="code-form" class="code-form" autocomplete="off">
+      <label for="code">Enter your code</label>
+      <div class="inline">
+        <input id="code" name="code" maxlength="20" placeholder="e.g. 7F9X2B" required />
+        <button type="submit">Verify</button>
+      </div>
+      <p class="hint">Tip: tapping the NFC tag should open verification automatically with your code.</p>
+    </form>
+
+    <section class="about">
+      <h2>What is this?</h2>
+      <p>
+        These are tiny art drops left in public places. Each piece has a unique, locked NFC link.
+        Enter the code or tap to confirm it’s authentic, then share your find!
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>© <span id="year"></span> Mini Art Drops</p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('code-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const code = (document.getElementById('code').value || '').trim();
+      if (code) window.location.href = `verify.html?code=${encodeURIComponent(code)}`;
+    });
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

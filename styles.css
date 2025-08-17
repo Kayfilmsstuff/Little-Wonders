@@ -1,0 +1,36 @@
+:root{
+  --bg:#0f1115; --card:#171a20; --text:#e8ecf1; --muted:#a9b3c3; --brand:#7cc4ff; --ok:#38d39f; --bad:#ff6b6b;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:16px}
+.site-header{padding:32px 0;border-bottom:1px solid #222}
+.site-header h1{margin:0;font-size:28px}
+.sub{color:var(--muted);margin-top:6px}
+.card{background:var(--card);border:1px solid #222;border-radius:14px;padding:20px;margin-top:24px;box-shadow:0 8px 20px rgba(0,0,0,.25)}
+.code-form label{display:block;margin-bottom:8px}
+.code-form .inline{display:flex;gap:10px}
+input{
+  flex:1;background:#0c0e12;color:var(--text);border:1px solid #2a2f3a;border-radius:10px;padding:12px 14px;
+}
+button,.buttonlike{
+  display:inline-block;background:var(--brand);color:#081019;border:0;border-radius:10px;padding:12px 16px;font-weight:600;cursor:pointer;text-decoration:none;
+}
+button:hover,.buttonlike:hover{filter:brightness(1.05)}
+.hint{color:var(--muted);font-size:14px;margin-top:8px}
+.result{
+  display:grid;grid-template-columns: 160px 1fr;gap:16px;align-items:start
+}
+.result img{width:100%;border-radius:12px;border:1px solid #252a35}
+.meta h2{margin:0 0 4px 0}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;margin-right:6px}
+.badge.ok{background:rgba(56,211,159,.15);color:var(--ok);border:1px solid rgba(56,211,159,.35)}
+.badge.bad{background:rgba(255,107,107,.15);color:var(--bad);border:1px solid rgba(255,107,107,.35)}
+.kv{margin:10px 0 0 0}
+.kv dt{color:var(--muted);font-size:14px}
+.kv dd{margin:0 0 8px 0}
+.site-footer{color:var(--muted);padding:20px 0;text-align:center}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline}
+textarea{width:100%;background:#0c0e12;color:var(--text);border:1px solid #2a2f3a;border-radius:10px;padding:10px}
+@media (max-width:640px){.result{grid-template-columns:1fr}}
