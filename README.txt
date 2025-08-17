@@ -1,4 +1,4 @@
-# Mini Art Drops — NFC Verify Site
+# Tiny Wonders — NFC Verify Site
 
 Upload this folder to a public GitHub repo and enable GitHub Pages (Settings → Pages → Branch: `main`, Folder: `/root`).
 
