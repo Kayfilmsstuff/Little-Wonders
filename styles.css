@@ -17,11 +17,30 @@ button,.buttonlike{
   display:inline-block;background:var(--brand);color:#081019;border:0;border-radius:10px;padding:12px 16px;font-weight:600;cursor:pointer;text-decoration:none;
 }
 button:hover,.buttonlike:hover{filter:brightness(1.05)}
-.hint{color:var(--muted);font-size:14px;margin-top:8px}
+/* two-column layout: media on the left, details on the right */
 .result{
-  display:grid;grid-template-columns: 160px 1fr;gap:16px;align-items:start
+  display:grid;
+  gap:16px;
+  grid-template-columns: 1fr;            /* mobile: stack */
+  align-items:start;
 }
-.result img{width:100%;border-radius:12px;border:1px solid #252a35}
+@media (min-width:900px){
+  .result{ grid-template-columns: 1.25fr 1fr; } /* desktop: give media more space */
+}
+
+/* make media fill its column */
+.media-grid img,
+.media-grid video{
+  width:100%;
+  height:auto;
+  display:block;
+  border-radius:12px;
+  border:1px solid #252a35;
+}
+
+/* if you don't already have this */
+.media-grid{display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:800px){.media-grid{grid-template-columns:1fr 1fr;align-items:start}}
 .meta h2{margin:0 0 4px 0}
 .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;margin-right:6px}
 .badge.ok{background:rgba(56,211,159,.15);color:var(--ok);border:1px solid rgba(56,211,159,.35)}
