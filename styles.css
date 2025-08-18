@@ -101,3 +101,20 @@ a{color:var(--accent)}
 .meta h2{margin:0 0 8px 0;font-size:28px}
 .meta .badge{margin-right:8px;margin-bottom:8px}
 .hint{color:var(--muted)}
+/* --- Tame portrait images / videos on desktop --- */
+@media (min-width: 900px){
+  /* keep the media column between 260–380px instead of super wide */
+  .result{
+    grid-template-columns: minmax(260px, 380px) 1fr;
+  }
+
+  /* don't let tall media dominate; keep aspect ratio */
+  .result img,
+  .result video,
+  .media-grid img,
+  .media-grid video{
+    max-height: 420px;   /* adjust to taste (360–480 works well) */
+    width: auto;
+    max-width: 100%;
+  }
+}
