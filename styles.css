@@ -1,120 +1,158 @@
-/* ====== Little Wonders — styles.css (drop-in) ====== */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Code</title>
+  <style>
+    body {
+      background: #0d1117;
+      color: #fff;
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      padding: 2rem;
+    }
 
-/* --- Theme --- */
-:root{
-  --bg:#0f1318;
-  --card:#151b22;
-  --ink:#e7edf5;
-  --muted:#a7b3c2;
-  --line:#252a35;
-  --accent:#6bb3ff;
-  --ok:#1e8f5a;
-  --bad:#b44c4c;
-  --radius:14px;
-  --shadow:0 10px 30px rgba(0,0,0,.35);
-}
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
 
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif}
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
 
-/* --- Layout helpers --- */
-.wrap{max-width:980px;margin:0 auto;padding:24px}
-.site-header{border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.02),transparent)}
-.site-header h1{margin:0 0 4px 0;font-size:36px;letter-spacing:.2px}
-.sub{margin:0;color:var(--muted)}
+    p {
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      color: #aaa;
+    }
 
-.site-footer{border-top:1px solid var(--line);margin-top:36px}
-.site-footer a{color:var(--accent);text-decoration:none}
+    .result {
+      display: grid;
+      grid-template-columns: minmax(260px, 340px) 1fr;
+      gap: 1.5rem;
+      align-items: start;
+      background: #161b22;
+      padding: 1.5rem;
+      border-radius: 12px;
+    }
 
-/* --- Card --- */
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:calc(var(--radius) + 2px);
-  box-shadow:var(--shadow);
-  padding:20px;
-}
+    .result img, 
+    .result video {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      display: block;
+    }
 
-/* --- Badges --- */
-.badge{
-  display:inline-block;
-  padding:6px 10px;
-  border-radius:999px;
-  font-size:13px;
-  line-height:1;
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.04);
-  color:var(--muted);
-}
-.badge.ok{background:rgba(30,143,90,.15);color:#b9f3d6;border-color:rgba(30,143,90,.35)}
-.badge.bad{background:rgba(180,76,76,.15);color:#ffd7d7;border-color:rgba(180,76,76,.35)}
+    .meta h2 {
+      margin: 0 0 10px 0;
+      font-size: 1.4rem;
+    }
 
-/* --- Buttons --- */
-button,.buttonlike{
-  appearance:none;border:0;cursor:pointer;
-  background:var(--accent);color:#0b0f14;
-  padding:12px 16px;border-radius:10px;
-  font-weight:600;text-decoration:none;display:inline-block;
-}
-button:hover,.buttonlike:hover{filter:brightness(1.07)}
-textarea{
-  width:100%;min-height:90px;resize:vertical;
-  background:#0d1116;color:var(--ink);
-  border:1px solid var(--line);border-radius:10px;padding:12px;
-}
+    .badges {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
 
-/* --- Key/value list --- */
-.kv{display:grid;grid-template-columns:120px 1fr;gap:6px 12px;margin:14px 0}
-.kv dt{color:var(--muted)}
-.kv dd{margin:0}
+    .badge {
+      background: #14532d;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+    }
 
-/* --- RESULT LAYOUT (big media) --- */
-.result{
-  display:grid;
-  gap:18px;
-  grid-template-columns:1fr;           /* mobile: stack */
-  align-items:start;
-}
-@media (min-width:900px){
-  .result{ grid-template-columns: 1.3fr 1fr; }  /* desktop: big media column */
-}
+    .kv {
+      margin: 8px 0 6px;
+      font-size: 0.9rem;
+    }
 
-/* media block can hold image and/or video */
-.result img,
-.result video{
-  width:100%;
-  height:auto;
-  display:block;
-  border-radius:12px;
-  border:1px solid var(--line);
-  background:#0b0f14;
-}
+    textarea {
+      width: 100%;
+      min-height: 72px;
+      margin: 0.75rem 0;
+      padding: 0.5rem;
+      border-radius: 6px;
+      border: none;
+      resize: none;
+      font-family: inherit;
+      font-size: 0.9rem;
+      background: #0d1117;
+      color: #eee;
+    }
 
-/* if you output multiple media items, arrange them */
-.media-grid{display:grid;gap:12px;grid-template-columns:1fr}
-@media (min-width:800px){ .media-grid{grid-template-columns:1fr 1fr} }
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
 
-/* --- Links --- */
-a{color:var(--accent)}
+    button {
+      background: #3b82f6;
+      border: none;
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: white;
+    }
 
-/* --- Spacing tweaks --- */
-.meta h2{margin:0 0 8px 0;font-size:28px}
-.meta .badge{margin-right:8px;margin-bottom:8px}
-.hint{color:var(--muted)}
-/* --- Tame portrait images / videos on desktop --- */
-@media (min-width: 900px){
-  /* keep the media column between 260–380px instead of super wide */
-  .result{
-    grid-template-columns: minmax(260px, 380px) 1fr;
-  }
+    button:hover {
+      background: #2563eb;
+    }
 
-  /* don't let tall media dominate; keep aspect ratio */
-  .result img,
-  .result video,
-  .media-grid img,
-  .media-grid video{
-    max-height: 420px;   /* adjust to taste (360–480 works well) */
-    width: auto;
-    max-width: 100%;
-  }
-}
+    a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>I found this!</h1>
+    <p>Here’s what your NFC code matches:</p>
+
+    <div class="result">
+      <!-- left side -->
+      <div class="media">
+        <img src="cat.png" alt="Little Wonder — Backpack Trans Cat">
+      </div>
+
+      <!-- right side -->
+      <div class="meta">
+        <h2>Little Wonder — Backpack Trans Cat</h2>
+        <div class="badges">
+          <div class="badge">Authentic</div>
+          <div class="badge">Edition 1/2</div>
+        </div>
+        <div class="kv"><strong>Code</strong> CAT-01</div>
+        
+        <div class="share">
+          <h3>Share it:</h3>
+          <textarea readonly>I found a Little Wonder — the Backpack Trans Cat! 🐱🎒 #LittleWondersFinds #FoundArt — Edition 1/2</textarea>
+          <div class="buttons">
+            <button>Copy caption</button>
+            <button>Open Instagram</button>
+            <button>Instagram (web)</button>
+          </div>
+        </div>
+
+        <p style="margin-top:1rem; font-size:0.85rem; color:#999;">
+          Post a pic and tag @kayfilmsstuff so we can see it!
+        </p>
+      </div>
+    </div>
+
+    <p style="margin-top:2rem;">
+      <a href="verify.html">Verify another code</a>
+    </p>
+  </div>
+</body>
+</html>
