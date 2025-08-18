@@ -4,14 +4,7 @@
   <meta charset="utf-8" />
   <title>I found this! — Little Wonders</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="styles.css" rel="stylesheet" />
-
-  <!-- small helper styles just for media layout -->
-  <style>
-    .media-grid{display:grid;gap:12px;grid-template-columns:1fr}
-    @media (min-width:800px){.media-grid{grid-template-columns:1fr 1fr;align-items:start}}
-    .media-grid img,.media-grid video{width:100%;border-radius:12px;border:1px solid #252a35}
-  </style>
+  <link href="styles.css?v=lw3" rel="stylesheet" />
 </head>
 <body>
   <header class="site-header">
@@ -27,14 +20,13 @@
     <div class="wrap"><a href="index.html">Verify another code</a></div>
   </footer>
 
-  <!-- Inline script: dynamic prefix + edition range + image/video rendering -->
   <script>
   (function () {
     const el  = document.getElementById('result');
     const out = (html) => el.innerHTML = html;
     const esc = (s) => (s+'').replace(/[&<>\"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(location.search);
     const code   = (params.get('code') || '').trim().toUpperCase();
     if (!code) { out('<p class="badge bad">No code</p><p>Open this from the NFC tag or enter a code on the home page.</p>'); return; }
 
@@ -42,30 +34,22 @@
       .then(r => { if (!r.ok) throw new Error('items.json HTTP ' + r.status); return r.json(); })
       .then(db => {
         const items = Array.isArray(db.items) ? db.items : [];
-
-        // Exact match (legacy)
+        // exact match (legacy)
         let item = items.find(x => (x.code || '').toUpperCase() === code);
         let edition = null;
 
-        // Dynamic prefix WITH RANGE CHECK (only 1..total allowed)
+        // dynamic prefix + range check
         if (!item) {
-          const cand = items.find(x =>
-            typeof x.prefix === 'string' &&
-            code.startsWith((x.prefix || '').toUpperCase())
-          );
+          const cand = items.find(x => typeof x.prefix === 'string' && code.startsWith((x.prefix||'').toUpperCase()));
           if (cand) {
-            const pref   = (cand.prefix || '').toUpperCase();
-            const suffix = code.slice(pref.length);
-            const m      = suffix.match(/\d+/);
-            const num    = m ? parseInt(m[0], 10) : NaN;
-
+            const pref = (cand.prefix||'').toUpperCase();
+            const m = code.slice(pref.length).match(/\d+/);
+            const num = m ? parseInt(m[0],10) : NaN;
             if (!Number.isFinite(num) || num < 1 || (cand.total && num > cand.total)) {
               out(`<p class="badge bad">Not found</p><p>Code “${esc(code)}” isn’t registered for this series.</p>`);
               return;
             }
-
-            item = cand;
-            edition = `${num}/${cand.total}`;
+            item = cand; edition = `${num}/${cand.total}`;
           }
         } else if (item.edition) {
           edition = String(item.edition);
@@ -73,17 +57,13 @@
 
         if (!item) { out(`<p class="badge bad">Not found</p><p>Code “${esc(code)}” isn’t in our records.</p>`); return; }
 
-        // Build media blocks — show video if provided, and/or image if provided
+        // Build media (video then image if present)
         const blocks = [];
-        if (item.video) {
-          blocks.push(`<video src="${esc(item.video)}" controls autoplay muted loop playsinline></video>`);
-        }
-        if (item.image) {
-          blocks.push(`<img src="${esc(item.image)}" alt="${esc(item.title || 'Found piece')}">`);
-        }
+        if (item.video) blocks.push(`<video src="${esc(item.video)}" controls autoplay muted loop playsinline></video>`);
+        if (item.image) blocks.push(`<img src="${esc(item.image)}" alt="${esc(item.title || 'Found piece')}">`);
 
-        const ig  = item.instagram || 'https://instagram.com/';
-        const igUser = (ig.replace(/\/$/,'').split('/').pop() || '').replace('@','');
+        const ig = item.instagram || 'https://instagram.com/';
+        const igUser = (ig.replace(/\/$/,'').split('/').pop()||'').replace('@','');
         const igDeep = `instagram://user?username=${encodeURIComponent(igUser)}`;
         const baseCap = item.caption || `I found a Little Wonder! Code ${code}`;
         const caption = edition ? `${baseCap} — Edition ${edition}` : baseCap;
@@ -93,7 +73,10 @@
             ${blocks.length ? `<div class="media-grid">${blocks.join('')}</div>` : ''}
             <div class="meta">
               <h2>${esc(item.title || 'Little Wonder')}</h2>
-              <div><span class="badge ok">Authentic</span>${edition ? ` <span class="badge ok">Edition ${esc(edition)}</span>` : ''}</div>
+              <div>
+                <span class="badge ok">Authentic</span>
+                ${edition ? ` <span class="badge ok">Edition ${esc(edition)}</span>` : ''}
+              </div>
               <dl class="kv"><dt>Code</dt><dd>${esc(code)}</dd></dl>
 
               <div style="margin-top:14px">
@@ -101,6 +84,7 @@
                 <textarea id="cap" rows="3">${esc(caption)}</textarea>
                 <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
                   <button id="copyBtn">Copy caption</button>
+                  <button id="foundBtn">I found it!</button>
                   <a class="buttonlike" href="${esc(igDeep)}">Open Instagram</a>
                   <a class="buttonlike" href="${esc(ig)}" target="_blank" rel="noopener">Instagram (web)</a>
                 </div>
@@ -111,12 +95,40 @@
           </div>
         `);
 
+        // Copy
         document.getElementById('copyBtn')?.addEventListener('click', async () => {
-          try {
-            await navigator.clipboard.writeText(document.getElementById('cap').value);
-            const b = document.getElementById('copyBtn'); b.textContent = 'Copied!'; setTimeout(()=>b.textContent='Copy caption',1200);
+          try { await navigator.clipboard.writeText(document.getElementById('cap').value);
+                const b = document.getElementById('copyBtn'); b.textContent='Copied!'; setTimeout(()=>b.textContent='Copy caption',1200);
           } catch {}
         });
+
+        // Passive one-time "view" log per device+code (optional)
+        try {
+          const k='LW_VIEWED_'+code;
+          if (!localStorage.getItem(k)) { localStorage.setItem(k,'1'); sendLog('view'); }
+        } catch {}
+
+        // "I found it!" explicit claim
+        const foundBtn = document.getElementById('foundBtn');
+        foundBtn?.addEventListener('click', async () => {
+          if (foundBtn.dataset.sent === '1') return;
+          foundBtn.dataset.sent = '1';
+          const ok = await sendLog('claim');
+          foundBtn.textContent = ok ? 'Logged — thank you!' : 'Try again';
+          if (!ok) foundBtn.dataset.sent = '0';
+        });
+
+        // --- logging helper (replace URL below) ---
+        function sendLog(eventType){
+          const endpoint = 'PASTE_YOUR_APPS_SCRIPT_EXEC_URL_HERE';
+          if (endpoint.includes('PASTE_YOUR')) return Promise.resolve(false);
+          const payload = { event:eventType, code, ua:navigator.userAgent, ref:document.referrer };
+          return fetch(endpoint, {
+            method:'POST', mode:'no-cors',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify(payload)
+          }).then(()=>true).catch(()=>false);
+        }
       })
       .catch(err => out('<p class="badge bad">Error</p><p style="white-space:pre-wrap">'+esc(err.message||String(err))+'</p>'));
   })();
