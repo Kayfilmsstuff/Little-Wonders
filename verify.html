@@ -4,7 +4,52 @@
   <meta charset="utf-8" />
   <title>I found this! — Little Wonders</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="styles.css?v=lw3" rel="stylesheet" />
+  <style>
+    :root{
+      --bg:#0f1318; --card:#151b22; --ink:#e7edf5; --muted:#a7b3c2;
+      --line:#252a35; --accent:#6bb3ff; --ok:#1e8f5a; --radius:14px;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+      font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif}
+    .wrap{max-width:980px;margin:0 auto;padding:24px}
+    .site-header{border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.02),transparent)}
+    .site-header h1{margin:0 0 4px 0;font-size:36px}
+    .sub{margin:0;color:var(--muted)}
+
+    .card{background:var(--card);border:1px solid var(--line);
+      border-radius:calc(var(--radius)+2px);box-shadow:var(--shadow);padding:20px}
+
+    .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-size:13px;line-height:1;
+      border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted)}
+    .badge.ok{background:rgba(30,143,90,.15);color:#b9f3d6;border-color:rgba(30,143,90,.35)}
+    .badge.bad{background:rgba(180,76,76,.15);color:#ffd7d7;border-color:rgba(180,76,76,.35)}
+
+    button,.buttonlike{appearance:none;border:0;cursor:pointer;background:var(--accent);color:#0b0f14;
+      padding:12px 16px;border-radius:10px;font-weight:600;text-decoration:none;display:inline-block}
+    button:hover,.buttonlike:hover{filter:brightness(1.07)}
+    textarea{width:100%;min-height:90px;resize:vertical;background:#0d1116;color:var(--ink);
+      border:1px solid var(--line);border-radius:10px;padding:12px}
+
+    .kv{display:grid;grid-template-columns:120px 1fr;gap:6px 12px;margin:14px 0}
+    .kv dt{color:var(--muted)} .kv dd{margin:0}
+
+    /* === ORIGINAL-STYLE MEDIA: small fixed thumbnail on the left === */
+    .result{
+      display:grid; gap:18px; align-items:start;
+      grid-template-columns: 180px 1fr;              /* fixed thumb width */
+    }
+    @media (max-width:700px){ .result{ grid-template-columns: 1fr; } } /* stack on mobile */
+
+    .thumb img, .thumb video{
+      width:100%; height:auto; display:block;
+      border-radius:12px; border:1px solid var(--line); background:#0b0f14;
+    }
+    .meta h2{margin:0 0 10px 0;font-size:28px}
+    .meta .badge{margin-right:8px;margin-bottom:8px}
+    .hint{color:var(--muted)}
+  </style>
 </head>
 <body>
   <header class="site-header">
@@ -16,10 +61,6 @@
 
   <main class="wrap card" id="result"></main>
 
-  <footer class="site-footer">
-    <div class="wrap"></div>
-  </footer>
-
   <script>
   (function () {
     const el  = document.getElementById('result');
@@ -28,12 +69,13 @@
 
     const params = new URLSearchParams(location.search);
     const code   = (params.get('code') || '').trim().toUpperCase();
-    if (!code) { out('<p class="badge bad">No code</p><p>Open this from the NFC tag or enter a code on the home page.</p>'); return; }
+    if (!code) { out('<p class="badge bad">No code</p><p>Open this from the NFC tag.</p>'); return; }
 
     fetch('data/items.json', { cache: 'no-store' })
       .then(r => { if (!r.ok) throw new Error('items.json HTTP ' + r.status); return r.json(); })
       .then(db => {
         const items = Array.isArray(db.items) ? db.items : [];
+
         // exact match (legacy)
         let item = items.find(x => (x.code || '').toUpperCase() === code);
         let edition = null;
@@ -43,8 +85,8 @@
           const cand = items.find(x => typeof x.prefix === 'string' && code.startsWith((x.prefix||'').toUpperCase()));
           if (cand) {
             const pref = (cand.prefix||'').toUpperCase();
-            const m = code.slice(pref.length).match(/\d+/);
-            const num = m ? parseInt(m[0],10) : NaN;
+            const m    = code.slice(pref.length).match(/\d+/);
+            const num  = m ? parseInt(m[0],10) : NaN;
             if (!Number.isFinite(num) || num < 1 || (cand.total && num > cand.total)) {
               out(`<p class="badge bad">Not found</p><p>Code “${esc(code)}” isn’t registered for this series.</p>`);
               return;
@@ -57,20 +99,23 @@
 
         if (!item) { out(`<p class="badge bad">Not found</p><p>Code “${esc(code)}” isn’t in our records.</p>`); return; }
 
-        // Build media (video then image if present)
-        const blocks = [];
-        if (item.video) blocks.push(`<video src="${esc(item.video)}" controls autoplay muted loop playsinline></video>`);
-        if (item.image) blocks.push(`<img src="${esc(item.image)}" alt="${esc(item.title || 'Found piece')}">`);
+        // Build small thumbnail (video takes priority if present)
+        let thumb = '';
+        if (item.video) {
+          thumb = `<video src="${esc(item.video)}" controls playsinline></video>`;
+        } else if (item.image) {
+          thumb = `<img src="${esc(item.image)}" alt="${esc(item.title || 'Found piece')}">`;
+        }
 
-        const ig = item.instagram || 'https://instagram.com/';
-        const igUser = (ig.replace(/\/$/,'').split('/').pop()||'').replace('@','');
+        const ig  = item.instagram || 'https://instagram.com/';
+        const igUser = (ig.replace(/\/$/,'').split('/').pop() || '').replace('@','');
         const igDeep = `instagram://user?username=${encodeURIComponent(igUser)}`;
         const baseCap = item.caption || `I found a Little Wonder! Code ${code}`;
         const caption = edition ? `${baseCap} — Edition ${edition}` : baseCap;
 
         out(`
           <div class="result">
-            ${blocks.length ? `<div class="media-grid">${blocks.join('')}</div>` : ''}
+            <div class="thumb">${thumb || ''}</div>
             <div class="meta">
               <h2>${esc(item.title || 'Little Wonder')}</h2>
               <div>
@@ -84,7 +129,6 @@
                 <textarea id="cap" rows="3">${esc(caption)}</textarea>
                 <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
                   <button id="copyBtn">Copy caption</button>
-                  <button id="foundBtn">I found it!</button>
                   <a class="buttonlike" href="${esc(igDeep)}">Open Instagram</a>
                   <a class="buttonlike" href="${esc(ig)}" target="_blank" rel="noopener">Instagram (web)</a>
                 </div>
@@ -95,40 +139,13 @@
           </div>
         `);
 
-        // Copy
+        // Copy button
         document.getElementById('copyBtn')?.addEventListener('click', async () => {
           try { await navigator.clipboard.writeText(document.getElementById('cap').value);
-                const b = document.getElementById('copyBtn'); b.textContent='Copied!'; setTimeout(()=>b.textContent='Copy caption',1200);
+                const b = document.getElementById('copyBtn');
+                b.textContent='Copied!'; setTimeout(()=>b.textContent='Copy caption',1200);
           } catch {}
         });
-
-        // Passive one-time "view" log per device+code (optional)
-        try {
-          const k='LW_VIEWED_'+code;
-          if (!localStorage.getItem(k)) { localStorage.setItem(k,'1'); sendLog('view'); }
-        } catch {}
-
-        // "I found it!" explicit claim
-        const foundBtn = document.getElementById('foundBtn');
-        foundBtn?.addEventListener('click', async () => {
-          if (foundBtn.dataset.sent === '1') return;
-          foundBtn.dataset.sent = '1';
-          const ok = await sendLog('claim');
-          foundBtn.textContent = ok ? 'Logged — thank you!' : 'Try again';
-          if (!ok) foundBtn.dataset.sent = '0';
-        });
-
-        // --- logging helper (replace URL below) ---
-        function sendLog(eventType){
-          const endpoint = 'PASTE_YOUR_APPS_SCRIPT_EXEC_URL_HERE';
-          if (endpoint.includes('PASTE_YOUR')) return Promise.resolve(false);
-          const payload = { event:eventType, code, ua:navigator.userAgent, ref:document.referrer };
-          return fetch(endpoint, {
-            method:'POST', mode:'no-cors',
-            headers:{'Content-Type':'application/json'},
-            body: JSON.stringify(payload)
-          }).then(()=>true).catch(()=>false);
-        }
       })
       .catch(err => out('<p class="badge bad">Error</p><p style="white-space:pre-wrap">'+esc(err.message||String(err))+'</p>'));
   })();
