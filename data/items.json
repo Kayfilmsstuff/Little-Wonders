@@ -1,14 +1,19 @@
 {
-  "items": [
-    {
-      "series": "Backpack Trans Cat",
-      "prefix": "CAT-",
-      "total": 1,
-      "title": "Little Wonder — Backpack Trans Cat",
-      "image": "images/Transcat.jpg",
-      "instagram": "https://www.instagram.com/kayfilmsstuff/",
-      "caption": "I found a Little Wonder — the Backpack Trans Cat! 🐱🎒 #LittleWondersFinds #FoundArt",
-      "note": "Post a pic and tag @kayfilmsstuff so we can see it!"
-    }
-  ]
+  "series": "Backpack Trans Cat",
+  "prefix": "CAT-",
+  "total": 2,
+  "title": "Little Wonder — Backpack Trans Cat",
+  "image": "images/Transcat.jpg",
+  "instagram": "https://www.instagram.com/kayfilmsstuff/",
+  "caption": "I found a Little Wonder — the Backpack Trans Cat! 🐱🎒 #LittleWondersFinds #FoundArt",
+  "note": "Post a pic and tag @kayfilmsstuff so we can see it!"
+},
+{
+  "series": "Mushroom Door",
+  "prefix": "DOOR-",
+  "total": 1,
+  "title": "Little Wonder — Mushroom Door",
+  "image": "images/mushroom-door.jpg",
+  "instagram": "https://www.instagram.com/kayfilmsstuff/",
+  "caption": "I found a Little Wonder — the Mushroom Door! 🍄🚪 #LittleWondersFinds #FoundArt"
 }
