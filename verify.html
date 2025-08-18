@@ -5,6 +5,13 @@
   <title>I found this! — Little Wonders</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="styles.css" rel="stylesheet" />
+
+  <!-- small helper styles just for media layout -->
+  <style>
+    .media-grid{display:grid;gap:12px;grid-template-columns:1fr}
+    @media (min-width:800px){.media-grid{grid-template-columns:1fr 1fr;align-items:start}}
+    .media-grid img,.media-grid video{width:100%;border-radius:12px;border:1px solid #252a35}
+  </style>
 </head>
 <body>
   <header class="site-header">
@@ -20,16 +27,16 @@
     <div class="wrap"><a href="index.html">Verify another code</a></div>
   </footer>
 
-  <!-- INLINE SCRIPT with edition range check -->
+  <!-- Inline script: dynamic prefix + edition range + image/video rendering -->
   <script>
   (function () {
-    const el = document.getElementById('result');
-    const show = (html) => el.innerHTML = html;
-    const esc  = (s) => (s+'').replace(/[&<>\"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    const el  = document.getElementById('result');
+    const out = (html) => el.innerHTML = html;
+    const esc = (s) => (s+'').replace(/[&<>\"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
     const params = new URLSearchParams(window.location.search);
-    const code = (params.get('code') || '').trim().toUpperCase();
-    if (!code) { show('<p class="badge bad">No code</p><p>Open this from the NFC tag or enter a code on the home page.</p>'); return; }
+    const code   = (params.get('code') || '').trim().toUpperCase();
+    if (!code) { out('<p class="badge bad">No code</p><p>Open this from the NFC tag or enter a code on the home page.</p>'); return; }
 
     fetch('data/items.json', { cache: 'no-store' })
       .then(r => { if (!r.ok) throw new Error('items.json HTTP ' + r.status); return r.json(); })
@@ -48,13 +55,12 @@
           );
           if (cand) {
             const pref   = (cand.prefix || '').toUpperCase();
-            const suffix = code.slice(pref.length);          // e.g. "01", "2", "05A"
-            const m      = suffix.match(/\d+/);              // first digits
+            const suffix = code.slice(pref.length);
+            const m      = suffix.match(/\d+/);
             const num    = m ? parseInt(m[0], 10) : NaN;
 
-            // reject out-of-range or non-numeric numbers
             if (!Number.isFinite(num) || num < 1 || (cand.total && num > cand.total)) {
-              show(`<p class="badge bad">Not found</p><p>Code “${esc(code)}” isn’t registered for this series.</p>`);
+              out(`<p class="badge bad">Not found</p><p>Code “${esc(code)}” isn’t registered for this series.</p>`);
               return;
             }
 
@@ -65,22 +71,31 @@
           edition = String(item.edition);
         }
 
-        if (!item) { show(`<p class="badge bad">Not found</p><p>Code “${esc(code)}” isn’t in our records.</p>`); return; }
+        if (!item) { out(`<p class="badge bad">Not found</p><p>Code “${esc(code)}” isn’t in our records.</p>`); return; }
 
-        const img = item.image || '';
+        // Build media blocks — show video if provided, and/or image if provided
+        const blocks = [];
+        if (item.video) {
+          blocks.push(`<video src="${esc(item.video)}" controls autoplay muted loop playsinline></video>`);
+        }
+        if (item.image) {
+          blocks.push(`<img src="${esc(item.image)}" alt="${esc(item.title || 'Found piece')}">`);
+        }
+
         const ig  = item.instagram || 'https://instagram.com/';
         const igUser = (ig.replace(/\/$/,'').split('/').pop() || '').replace('@','');
         const igDeep = `instagram://user?username=${encodeURIComponent(igUser)}`;
         const baseCap = item.caption || `I found a Little Wonder! Code ${code}`;
         const caption = edition ? `${baseCap} — Edition ${edition}` : baseCap;
 
-        show(`
+        out(`
           <div class="result">
-            ${img ? `<div><img src="${esc(img)}" alt="${esc(item.title || 'Found piece')}" /></div>` : ''}
+            ${blocks.length ? `<div class="media-grid">${blocks.join('')}</div>` : ''}
             <div class="meta">
               <h2>${esc(item.title || 'Little Wonder')}</h2>
-              <div><span class="badge ok">Authentic</span>${edition ? ` <span class="badge ok">Edition ${esc(edition)}</span>`:''}</div>
+              <div><span class="badge ok">Authentic</span>${edition ? ` <span class="badge ok">Edition ${esc(edition)}</span>` : ''}</div>
               <dl class="kv"><dt>Code</dt><dd>${esc(code)}</dd></dl>
+
               <div style="margin-top:14px">
                 <p><strong>Share it:</strong></p>
                 <textarea id="cap" rows="3">${esc(caption)}</textarea>
@@ -90,18 +105,20 @@
                   <a class="buttonlike" href="${esc(ig)}" target="_blank" rel="noopener">Instagram (web)</a>
                 </div>
               </div>
+
               ${item.note ? `<p class="hint" style="margin-top:10px">${esc(item.note)}</p>` : ''}
             </div>
           </div>
         `);
 
         document.getElementById('copyBtn')?.addEventListener('click', async () => {
-          try { await navigator.clipboard.writeText(document.getElementById('cap').value);
-                const b=document.getElementById('copyBtn'); b.textContent='Copied!'; setTimeout(()=>b.textContent='Copy caption',1200);
+          try {
+            await navigator.clipboard.writeText(document.getElementById('cap').value);
+            const b = document.getElementById('copyBtn'); b.textContent = 'Copied!'; setTimeout(()=>b.textContent='Copy caption',1200);
           } catch {}
         });
       })
-      .catch(err => show('<p class="badge bad">Error</p><p style="white-space:pre-wrap">'+esc(err.message||String(err))+'</p>'));
+      .catch(err => out('<p class="badge bad">Error</p><p style="white-space:pre-wrap">'+esc(err.message||String(err))+'</p>'));
   })();
   </script>
 </body>
