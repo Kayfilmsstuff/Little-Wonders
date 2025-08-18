@@ -1,38 +1,35 @@
 {
   "items": [
     {
-  "series": "Backpack Trans Cat",
-  "prefix": "CAT-",
-  "total": 11,
-  "title": "Little Wonder — Backpack Trans Cat",
-  "image": "images/Transcat.jpg",
-  "instagram": "https://www.instagram.com/kayfilmsstuff/",
-  "caption": "I found a Little Wonder — the Backpack Trans Cat! 🐱🎒 #LittleWondersFinds #FoundArt",
-  "note": "Post a pic and tag @kayfilmsstuff so we can see it!"
-}
-
-,
+      "series": "Backpack Trans Cat",
+      "prefix": "CAT-",
+      "total": 11,
+      "title": "Little Wonder — Backpack Trans Cat",
+      "image": "images/Transcat.jpg",
+      "instagram": "https://www.instagram.com/kayfilmsstuff/",
+      "caption": "I found a Little Wonder — the Backpack Trans Cat! 🐱🎒 #LittleWondersFinds #FoundArt",
+      "note": "Post a pic and tag @kayfilmsstuff so we can see it!"
+    },
     {
-  "series": "Backpack Hyrax",
-  "prefix": "HYR-",
-  "total": 1,
-  "title": "Little Wonder — Backpack Hyrax",
-  "image": "images/hyrax.jpg",
-  "video": "media/hyrax core2.mp4",
-  "instagram": "https://www.instagram.com/kayfilmsstuff/",
-  "caption": "I found a Little Wonder — the Backpack Hyrax! 🦔🎒 #LittleWondersFinds #FoundArt",
-  "note": "Post a pic or clip and tag @kayfilmsstuff!"
-},
-{
-  "series": "Hyrax in a Blanket (Flowers)",
-  "prefix": "HBF-",
-  "total": 1,
-  "title": "Little Wonder — Hyrax in a Blanket (Flowers)",
-  "image": "images/hyrax-blanket.jpg",
-  "instagram": "https://www.instagram.com/kayfilmsstuff/",
-  "caption": "I found a Little Wonder — the Hyrax in a Blanket (with flowers)! 🌸🦔 #LittleWondersFinds #FoundArt",
-  "note": "Post a pic or clip and tag @kayfilmsstuff!"
-}
-
+      "series": "Backpack Hyrax",
+      "prefix": "HYR-",
+      "total": 1,
+      "title": "Little Wonder — Backpack Hyrax",
+      "image": "images/hyrax.jpg",
+      "video": "media/hyrax-core2.mp4",
+      "instagram": "https://www.instagram.com/kayfilmsstuff/",
+      "caption": "I found a Little Wonder — the Backpack Hyrax! 🦔🎒 #LittleWondersFinds #FoundArt",
+      "note": "Post a pic or clip and tag @kayfilmsstuff!"
+    },
+    {
+      "series": "Hyrax in a Blanket (Flowers)",
+      "prefix": "HBF-",
+      "total": 1,
+      "title": "Little Wonder — Hyrax in a Blanket (Flowers)",
+      "image": "images/hyrax-blanket.jpg",
+      "instagram": "https://www.instagram.com/kayfilmsstuff/",
+      "caption": "I found a Little Wonder — the Hyrax in a Blanket (with flowers)! 🌸🦔 #LittleWondersFinds #FoundArt",
+      "note": "Post a pic or clip and tag @kayfilmsstuff!"
+    }
   ]
 }
