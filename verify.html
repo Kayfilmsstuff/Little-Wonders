@@ -20,7 +20,7 @@
     <div class="wrap"><a href="index.html">Verify another code</a></div>
   </footer>
 
-  <!-- INLINE SCRIPT: no external JS, so no caching/path issues -->
+  <!-- INLINE SCRIPT with edition range check -->
   <script>
   (function () {
     const el = document.getElementById('result');
@@ -35,16 +35,31 @@
       .then(r => { if (!r.ok) throw new Error('items.json HTTP ' + r.status); return r.json(); })
       .then(db => {
         const items = Array.isArray(db.items) ? db.items : [];
+
+        // Exact match (legacy)
         let item = items.find(x => (x.code || '').toUpperCase() === code);
         let edition = null;
 
+        // Dynamic prefix WITH RANGE CHECK (only 1..total allowed)
         if (!item) {
-          const cand = items.find(x => typeof x.prefix === 'string' && code.startsWith((x.prefix || '').toUpperCase()));
+          const cand = items.find(x =>
+            typeof x.prefix === 'string' &&
+            code.startsWith((x.prefix || '').toUpperCase())
+          );
           if (cand) {
+            const pref   = (cand.prefix || '').toUpperCase();
+            const suffix = code.slice(pref.length);          // e.g. "01", "2", "05A"
+            const m      = suffix.match(/\d+/);              // first digits
+            const num    = m ? parseInt(m[0], 10) : NaN;
+
+            // reject out-of-range or non-numeric numbers
+            if (!Number.isFinite(num) || num < 1 || (cand.total && num > cand.total)) {
+              show(`<p class="badge bad">Not found</p><p>Code “${esc(code)}” isn’t registered for this series.</p>`);
+              return;
+            }
+
             item = cand;
-            const pref = (cand.prefix || '').toUpperCase();
-            const num = parseInt(code.slice(pref.length).replace(/[^0-9]/g,''), 10);
-            if (!isNaN(num) && cand.total) edition = `${num}/${cand.total}`;
+            edition = `${num}/${cand.total}`;
           }
         } else if (item.edition) {
           edition = String(item.edition);
