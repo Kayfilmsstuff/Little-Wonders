@@ -1,55 +1,103 @@
+/* ====== Little Wonders — styles.css (drop-in) ====== */
+
+/* --- Theme --- */
 :root{
-  --bg:#0f1115; --card:#171a20; --text:#e8ecf1; --muted:#a9b3c3; --brand:#7cc4ff; --ok:#38d39f; --bad:#ff6b6b;
+  --bg:#0f1318;
+  --card:#151b22;
+  --ink:#e7edf5;
+  --muted:#a7b3c2;
+  --line:#252a35;
+  --accent:#6bb3ff;
+  --ok:#1e8f5a;
+  --bad:#b44c4c;
+  --radius:14px;
+  --shadow:0 10px 30px rgba(0,0,0,.35);
 }
+
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-.wrap{max-width:900px;margin:0 auto;padding:16px}
-.site-header{padding:32px 0;border-bottom:1px solid #222}
-.site-header h1{margin:0;font-size:28px}
-.sub{color:var(--muted);margin-top:6px}
-.card{background:var(--card);border:1px solid #222;border-radius:14px;padding:20px;margin-top:24px;box-shadow:0 8px 20px rgba(0,0,0,.25)}
-.code-form label{display:block;margin-bottom:8px}
-.code-form .inline{display:flex;gap:10px}
-input{
-  flex:1;background:#0c0e12;color:var(--text);border:1px solid #2a2f3a;border-radius:10px;padding:12px 14px;
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif}
+
+/* --- Layout helpers --- */
+.wrap{max-width:980px;margin:0 auto;padding:24px}
+.site-header{border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.02),transparent)}
+.site-header h1{margin:0 0 4px 0;font-size:36px;letter-spacing:.2px}
+.sub{margin:0;color:var(--muted)}
+
+.site-footer{border-top:1px solid var(--line);margin-top:36px}
+.site-footer a{color:var(--accent);text-decoration:none}
+
+/* --- Card --- */
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:calc(var(--radius) + 2px);
+  box-shadow:var(--shadow);
+  padding:20px;
 }
+
+/* --- Badges --- */
+.badge{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:13px;
+  line-height:1;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.04);
+  color:var(--muted);
+}
+.badge.ok{background:rgba(30,143,90,.15);color:#b9f3d6;border-color:rgba(30,143,90,.35)}
+.badge.bad{background:rgba(180,76,76,.15);color:#ffd7d7;border-color:rgba(180,76,76,.35)}
+
+/* --- Buttons --- */
 button,.buttonlike{
-  display:inline-block;background:var(--brand);color:#081019;border:0;border-radius:10px;padding:12px 16px;font-weight:600;cursor:pointer;text-decoration:none;
+  appearance:none;border:0;cursor:pointer;
+  background:var(--accent);color:#0b0f14;
+  padding:12px 16px;border-radius:10px;
+  font-weight:600;text-decoration:none;display:inline-block;
 }
-button:hover,.buttonlike:hover{filter:brightness(1.05)}
-/* two-column layout: media on the left, details on the right */
+button:hover,.buttonlike:hover{filter:brightness(1.07)}
+textarea{
+  width:100%;min-height:90px;resize:vertical;
+  background:#0d1116;color:var(--ink);
+  border:1px solid var(--line);border-radius:10px;padding:12px;
+}
+
+/* --- Key/value list --- */
+.kv{display:grid;grid-template-columns:120px 1fr;gap:6px 12px;margin:14px 0}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0}
+
+/* --- RESULT LAYOUT (big media) --- */
 .result{
   display:grid;
-  gap:16px;
-  grid-template-columns: 1fr;            /* mobile: stack */
+  gap:18px;
+  grid-template-columns:1fr;           /* mobile: stack */
   align-items:start;
 }
 @media (min-width:900px){
-  .result{ grid-template-columns: 1.25fr 1fr; } /* desktop: give media more space */
+  .result{ grid-template-columns: 1.3fr 1fr; }  /* desktop: big media column */
 }
 
-/* make media fill its column */
-.media-grid img,
-.media-grid video{
+/* media block can hold image and/or video */
+.result img,
+.result video{
   width:100%;
   height:auto;
   display:block;
   border-radius:12px;
-  border:1px solid #252a35;
+  border:1px solid var(--line);
+  background:#0b0f14;
 }
 
-/* if you don't already have this */
+/* if you output multiple media items, arrange them */
 .media-grid{display:grid;gap:12px;grid-template-columns:1fr}
-@media (min-width:800px){.media-grid{grid-template-columns:1fr 1fr;align-items:start}}
-.meta h2{margin:0 0 4px 0}
-.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;margin-right:6px}
-.badge.ok{background:rgba(56,211,159,.15);color:var(--ok);border:1px solid rgba(56,211,159,.35)}
-.badge.bad{background:rgba(255,107,107,.15);color:var(--bad);border:1px solid rgba(255,107,107,.35)}
-.kv{margin:10px 0 0 0}
-.kv dt{color:var(--muted);font-size:14px}
-.kv dd{margin:0 0 8px 0}
-.site-footer{color:var(--muted);padding:20px 0;text-align:center}
-a{color:var(--brand);text-decoration:none}
-a:hover{text-decoration:underline}
-textarea{width:100%;background:#0c0e12;color:var(--text);border:1px solid #2a2f3a;border-radius:10px;padding:10px}
-@media (max-width:640px){.result{grid-template-columns:1fr}}
+@media (min-width:800px){ .media-grid{grid-template-columns:1fr 1fr} }
+
+/* --- Links --- */
+a{color:var(--accent)}
+
+/* --- Spacing tweaks --- */
+.meta h2{margin:0 0 8px 0;font-size:28px}
+.meta .badge{margin-right:8px;margin-bottom:8px}
+.hint{color:var(--muted)}
