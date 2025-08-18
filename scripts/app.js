@@ -59,3 +59,32 @@
               ${edition ? ` <span class="badge ok">Edition ${esc(edition)}</span>` : ''}
             </div>
             <dl class="kv">
+              <dt>Code</dt><dd>${esc(code)}</dd>
+            </dl>
+            <div style="margin-top:14px">
+              <p><strong>Share it:</strong></p>
+              <textarea id="cap" rows="3">${esc(caption)}</textarea>
+              <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
+                <button id="copyBtn">Copy caption</button>
+                <a class="buttonlike" href="${esc(igDeep)}">Open Instagram</a>
+                <a class="buttonlike" href="${esc(ig)}" target="_blank" rel="noopener">Instagram (web)</a>
+              </div>
+            </div>
+            ${item.note ? `<p class="hint" style="margin-top:10px">${esc(item.note)}</p>` : ''}
+          </div>
+        </div>
+      `);
+
+      document.getElementById('copyBtn')?.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(document.getElementById('cap').value);
+          const b = document.getElementById('copyBtn');
+          b.textContent = 'Copied!';
+          setTimeout(() => (b.textContent = 'Copy caption'), 1200);
+        } catch {}
+      });
+    })
+    .catch(err => {
+      show(`<p class="badge bad">Error</p><p style="white-space:pre-wrap">${esc(err.message || String(err))}</p>`);
+    });
+})();
