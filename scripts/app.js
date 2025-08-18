@@ -22,7 +22,7 @@
       const ig  = item.instagram || 'https://instagram.com/';
       const igUser = (ig.replace(/\/$/,'').split('/').pop()||'').replace('@','');
       const igDeep = `instagram://user?username=${encodeURIComponent(igUser)}`;
-      const caption = item.caption || `I found this tiny art! Code ${code}`;
+      const caption = item.caption || `I found this little Wonder! Code ${code}`;
 
       el.innerHTML = `
         <div class="result">
