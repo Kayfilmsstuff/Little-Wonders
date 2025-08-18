@@ -1,41 +1,44 @@
 (function () {
   const el = document.getElementById('result');
-  function show(html){ el.innerHTML = html; }
-  function esc(s){ return (s+'').replace(/[&<>\"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+  const out = (html) => el.innerHTML = html;
+  const pre = (obj) => `<pre style="white-space:pre-wrap;background:#111;padding:12px;border-radius:8px;border:1px solid #333">${esc(typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2))}</pre>`;
+  const esc = s => (s+'').replace(/[&<>\"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
 
   try {
     const params = new URLSearchParams(window.location.search);
-    const codeRaw = (params.get('code') || '').trim();
-    const code = codeRaw.toUpperCase();
-    if (!code) { show(`<p class="badge bad">No code</p><p>Open this from the NFC tag or enter a code on the home page.</p>`); return; }
+    const code = (params.get('code') || '').trim().toUpperCase();
+    if (!code) return out(`<p class="badge bad">No code</p>`);
 
     fetch('data/items.json', { cache: 'no-store' })
-      .then(r => {
-        if (!r.ok) throw new Error(`items.json HTTP ${r.status} (path/case?)`);
-        return r.json();
-      })
+      .then(r => r.json())
       .then(db => {
+        // --- DEBUG: show what we loaded ---
+        let dbg = `Code in URL: ${code}\n\nLoaded items.json:\n`;
+        dbg += JSON.stringify(db, null, 2);
+
         const items = Array.isArray(db.items) ? db.items : [];
-        // Try exact
         let item = items.find(x => (x.code || '').toUpperCase() === code);
         let edition = null;
 
-        // Try prefix
         if (!item) {
-          const cand = items.find(x => typeof x.prefix === 'string' && code.startsWith((x.prefix || '').toUpperCase()));
-          if (cand) {
-            item = cand;
-            const pref = (cand.prefix || '').toUpperCase();
+          const match = items.find(x =>
+            typeof x.prefix === 'string' &&
+            code.startsWith((x.prefix || '').toUpperCase())
+          );
+          if (match) {
+            item = match;
+            const pref = (match.prefix || '').toUpperCase();
             const num = parseInt(code.slice(pref.length).replace(/[^0-9]/g,''), 10);
-            if (!isNaN(num) && cand.total) edition = `${num}/${cand.total}`;
+            if (!isNaN(num) && match.total) edition = `${num}/${match.total}`;
           }
         } else if (item.edition) {
           edition = String(item.edition);
         }
 
+        dbg += `\n\nMatched item: ${JSON.stringify(item, null, 2)}\nEdition: ${edition || '(none)'}`;
+
         if (!item) {
-          show(`<p class="badge bad">Not found</p><p>Code “${esc(code)}” isn’t in our records.</p>`);
-          return;
+          return out(`<p class="badge bad">Not found</p>${pre(dbg)}`);
         }
 
         const img = item.image || '';
@@ -43,7 +46,7 @@
         const captionBase = item.caption || `I found a Little Wonder! Code ${code}`;
         const caption = edition ? `${captionBase} — Edition ${edition}` : captionBase;
 
-        show(`
+        out(`
           <div class="result">
             ${img ? `<div><img src="${esc(img)}" alt="${esc(item.title||'Found piece')}" /></div>` : ''}
             <div class="meta">
@@ -64,20 +67,16 @@
               ${item.note ? `<p class="hint" style="margin-top:10px">${esc(item.note)}</p>` : ''}
             </div>
           </div>
+          <h3 style="margin-top:24px">DEBUG</h3>
+          ${pre(dbg)}
         `);
 
-        const btn = document.getElementById('copyBtn');
-        btn?.addEventListener('click', async () => {
+        document.getElementById('copyBtn')?.addEventListener('click', async () => {
           try {
             await navigator.clipboard.writeText(document.getElementById('cap').value);
-            btn.textContent = 'Copied!'; setTimeout(()=>btn.textContent='Copy caption',1200);
+            const b = document.getElementById('copyBtn');
+            b.textContent = 'Copied!'; setTimeout(()=>b.textContent='Copy caption',1200);
           } catch {}
         });
       })
-      .catch(err => {
-        show(`<p class="badge bad">Error</p><p style="white-space:pre-wrap">${esc(err.message||String(err))}</p>`);
-      });
-  } catch (e) {
-    show(`<p class="badge bad">Error</p><p style="white-space:pre-wrap">${esc(e.message||String(e))}</p>`);
-  }
-})();
+      .catch(err => out(`<p class="badge bad">Error</p>${pre(err.messag
