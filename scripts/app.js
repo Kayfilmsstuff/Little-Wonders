@@ -11,27 +11,36 @@
     return;
   }
 
-  // Always fetch fresh
   fetch('data/items.json', { cache: 'no-store' })
     .then(r => { if (!r.ok) throw new Error('items.json HTTP ' + r.status); return r.json(); })
     .then(db => {
       const items = Array.isArray(db.items) ? db.items : [];
 
-      // Exact match (legacy)
+      // 1) exact match (legacy)
       let item = items.find(x => (x.code || '').toUpperCase() === code);
       let edition = null;
 
-      // Dynamic prefix (CAT-01 -> series with prefix "CAT-")
+      // 2) dynamic prefix with RANGE CHECK (1..total)
       if (!item) {
         const cand = items.find(x =>
           typeof x.prefix === 'string' &&
           code.startsWith((x.prefix || '').toUpperCase())
         );
+
         if (cand) {
-          item = cand;
           const pref = (cand.prefix || '').toUpperCase();
-          const num = parseInt(code.slice(pref.length).replace(/[^0-9]/g, ''), 10);
-          if (!isNaN(num) && cand.total) edition = `${num}/${cand.total}`;
+          const suffix = code.slice(pref.length);               // e.g. "01", "2", "05A" (we'll parse digits only)
+          const m = suffix.match(/\d+/);                        // first number sequence
+          const num = m ? parseInt(m[0], 10) : NaN;
+
+          // must be a number, >=1, and <= total
+          if (!Number.isFinite(num) || num < 1 || (cand.total && num > cand.total)) {
+            show(`<p class="badge bad">Not found</p><p>Code “${esc(code)}” isn’t registered for this series.</p>`);
+            return;
+          }
+
+          item = cand;
+          edition = `${num}/${cand.total}`;
         }
       } else if (item.edition) {
         edition = String(item.edition);
@@ -78,9 +87,7 @@
       document.getElementById('copyBtn')?.addEventListener('click', async () => {
         try {
           await navigator.clipboard.writeText(document.getElementById('cap').value);
-          const b = document.getElementById('copyBtn');
-          b.textContent = 'Copied!';
-          setTimeout(() => (b.textContent = 'Copy caption'), 1200);
+          const b = document.getElementById('copyBtn'); b.textContent = 'Copied!'; setTimeout(()=>b.textContent='Copy caption',1200);
         } catch {}
       });
     })
